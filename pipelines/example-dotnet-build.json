@@ -1,0 +1,161 @@
+{
+  "Name": "Self-Healing Engine \u2013 Recursive Self-Validation",
+  "Description": "Builds the Self-Healing-AI-Pipeline-Engine project itself, then runs its own example pipeline JSON through validation to ensure proper pipeline creation, marker evaluation, and healing-loop readiness. Iterates until all markers pass or the attempt limit is reached.",
+  "TargetProjectPath": "C:\\Users\\EMILEKOWALSKI\\Documents\\GitHub\\Self-Healing-AI-Pipeline-Engine",
+  "MaxIterations": 20,
+  "Steps": [
+    {
+      "Id": "restore",
+      "Name": "Restore NuGet packages",
+      "Type": "Execute",
+      "Command": "dotnet restore Self-Healing-AI-Pipeline-Engine.sln",
+      "WorkingDir": "",
+      "FilePath": "",
+      "ExtractionPattern": "",
+      "OutputKey": "restore_output",
+      "Timeout": 120,
+      "FailBehavior": "Abort"
+    },
+    {
+      "Id": "build",
+      "Name": "Build project",
+      "Type": "Execute",
+      "Command": "dotnet build Self-Healing-AI-Pipeline-Engine.sln --no-restore -warnaserror",
+      "WorkingDir": "",
+      "FilePath": "",
+      "ExtractionPattern": "",
+      "OutputKey": "build_output",
+      "Timeout": 120,
+      "FailBehavior": "Continue"
+    },
+    {
+      "Id": "count_warnings",
+      "Name": "Count build warnings",
+      "Type": "Extract",
+      "Command": "cmd /c \"dotnet build Self-Healing-AI-Pipeline-Engine.sln --no-restore 2>&1 | find /c \"warning \"\"",
+      "WorkingDir": "",
+      "FilePath": "",
+      "ExtractionPattern": "([0-9]+)",
+      "OutputKey": "warning_count",
+      "Timeout": 120,
+      "FailBehavior": "Continue"
+    },
+    {
+      "Id": "validate_json",
+      "Name": "Validate example pipeline JSON",
+      "Type": "Validate",
+      "Command": "powershell -NoProfile -Command \"$j = Get-Content 'pipelines\\example-dotnet-build.json' -Raw | ConvertFrom-Json; if (-not $j.Name -or -not $j.Steps -or -not $j.Markers -or -not $j.TargetProjectPath) { exit 1 } else { exit 0 }\"",
+      "WorkingDir": "",
+      "FilePath": "",
+      "ExtractionPattern": "",
+      "OutputKey": "json_valid",
+      "Timeout": 30,
+      "FailBehavior": "Continue"
+    },
+    {
+      "Id": "check_models",
+      "Name": "Check model classes exist",
+      "Type": "Validate",
+      "Command": "cmd /c \"if exist Models\\Pipeline.cs if exist Models\\PipelineStep.cs if exist Models\\Marker.cs if exist Models\\FileAccessRule.cs if exist Models\\RunSession.cs if exist Models\\Iteration.cs (exit /b 0) else (exit /b 1)\"",
+      "WorkingDir": "",
+      "FilePath": "",
+      "ExtractionPattern": "",
+      "OutputKey": "models_exist",
+      "Timeout": 10,
+      "FailBehavior": "Continue"
+    },
+    {
+      "Id": "check_engine",
+      "Name": "Check engine classes exist",
+      "Type": "Validate",
+      "Command": "cmd /c \"if exist Engine\\StepExecutor.cs if exist Engine\\MarkerEvaluator.cs if exist Engine\\HealingLoop.cs if exist Engine\\PipelineEngine.cs (exit /b 0) else (exit /b 1)\"",
+      "WorkingDir": "",
+      "FilePath": "",
+      "ExtractionPattern": "",
+      "OutputKey": "engine_exist",
+      "Timeout": 10,
+      "FailBehavior": "Continue"
+    }
+  ],
+  "Markers": [
+    {
+      "Id": "build_success",
+      "Name": "Build succeeds (exit code 0)",
+      "Type": "ExitCode",
+      "Source": "build_output",
+      "Operator": "Equals",
+      "TargetValue": "0"
+    },
+    {
+      "Id": "zero_warnings",
+      "Name": "Build produces zero warnings",
+      "Type": "ExitCode",
+      "Source": "build_output",
+      "Operator": "Equals",
+      "TargetValue": "0"
+    },
+    {
+      "Id": "json_valid",
+      "Name": "Example pipeline JSON is valid and complete",
+      "Type": "ExitCode",
+      "Source": "json_valid",
+      "Operator": "Equals",
+      "TargetValue": "0"
+    },
+    {
+      "Id": "models_exist",
+      "Name": "All model classes exist",
+      "Type": "ExitCode",
+      "Source": "models_exist",
+      "Operator": "Equals",
+      "TargetValue": "0"
+    },
+    {
+      "Id": "engine_exist",
+      "Name": "All engine classes exist",
+      "Type": "ExitCode",
+      "Source": "engine_exist",
+      "Operator": "Equals",
+      "TargetValue": "0"
+    }
+  ],
+  "FileAccessRules": [
+    {
+      "PathPattern": "**/*.cs",
+      "AccessLevel": "Editable"
+    },
+    {
+      "PathPattern": "**/*.xaml",
+      "AccessLevel": "Editable"
+    },
+    {
+      "PathPattern": "**/*.xaml.cs",
+      "AccessLevel": "Editable"
+    },
+    {
+      "PathPattern": "**/*.csproj",
+      "AccessLevel": "Editable"
+    },
+    {
+      "PathPattern": "pipelines/**/*.json",
+      "AccessLevel": "Editable"
+    },
+    {
+      "PathPattern": ".git/**",
+      "AccessLevel": "Excluded"
+    },
+    {
+      "PathPattern": "obj/**",
+      "AccessLevel": "Excluded"
+    },
+    {
+      "PathPattern": "bin/**",
+      "AccessLevel": "Excluded"
+    },
+    {
+      "PathPattern": ".vs/**",
+      "AccessLevel": "Excluded"
+    }
+  ],
+  "HealingPromptTemplate": "You are a self-healing meta-engineer. The pipeline that builds the Self-Healing-AI-Pipeline-Engine project has failing markers. Analyze the step outputs and marker results, then fix the underlying code, configuration, or pipeline JSON to make all markers pass."
+}

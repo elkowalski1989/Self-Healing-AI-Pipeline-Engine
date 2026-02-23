@@ -1,0 +1,311 @@
+<UserControl x:Class="SelfHealingPipeline.Views.PipelineEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header bar -->
+        <Border Grid.Row="0" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Pipeline Editor" FontSize="20" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock x:Name="PipelineNameLabel" Text="No pipeline loaded"
+                               FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <Button x:Name="LoadButton" Grid.Column="1" Margin="0,0,8,0" Padding="14,8"
+                        Cursor="Hand" BorderThickness="0">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd" Background="{DynamicResource CardBrush}"
+                                    CornerRadius="8" Padding="{TemplateBinding Padding}"
+                                    BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}">
+                                <TextBlock Text="📂 Load" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHoverBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <Button x:Name="SaveButton" Grid.Column="2" Padding="14,8"
+                        Cursor="Hand" BorderThickness="0">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd" Background="{StaticResource AccentBrush}"
+                                    CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                <TextBlock Text="💾 Save" Foreground="White" FontSize="12" FontWeight="SemiBold"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentHoverBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Main content: split layout -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" MinWidth="280"/>
+                <ColumnDefinition Width="3*" MinWidth="350"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: pipeline config + steps list -->
+            <Border Grid.Column="0" CornerRadius="12" Padding="14"
+                    Background="{DynamicResource SurfaceBrush}" Margin="0,0,8,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <!-- Pipeline metadata -->
+                        <TextBlock Text="PIPELINE" FontSize="10" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,8"/>
+
+                        <TextBlock Text="Name" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                        <TextBox x:Name="NameBox" FontSize="13" Padding="8,6"
+                                 Background="{DynamicResource InputBrush}"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                 Margin="0,0,0,8"/>
+
+                        <TextBlock Text="Description" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                        <TextBox x:Name="DescBox" FontSize="13" Padding="8,6" TextWrapping="Wrap"
+                                 AcceptsReturn="True" MinHeight="40"
+                                 Background="{DynamicResource InputBrush}"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                 Margin="0,0,0,8"/>
+
+                        <TextBlock Text="Target Project Path" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                        <TextBox x:Name="TargetPathBox" FontSize="13" Padding="8,6"
+                                 Background="{DynamicResource InputBrush}"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                 Margin="0,0,0,8"/>
+
+                        <TextBlock Text="Max Iterations" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                        <TextBox x:Name="MaxIterBox" FontSize="13" Padding="8,6" Width="80"
+                                 HorizontalAlignment="Left"
+                                 Background="{DynamicResource InputBrush}"
+                                 Foreground="{DynamicResource TextPrimaryBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                 Margin="0,0,0,16"/>
+
+                        <!-- Steps section -->
+                        <Grid Margin="0,0,0,8">
+                            <TextBlock Text="STEPS" FontSize="10" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+                            <Button x:Name="AddStepButton" HorizontalAlignment="Right" Padding="8,3"
+                                    Cursor="Hand" BorderThickness="0">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="Bd" Background="{DynamicResource CardBrush}"
+                                                CornerRadius="6" Padding="{TemplateBinding Padding}"
+                                                BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}">
+                                            <TextBlock Text="+ Add" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHoverBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+
+                        <StackPanel x:Name="StepList" AllowDrop="True"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Right: config panel (changes based on selection) -->
+            <Border Grid.Column="1" CornerRadius="12" Padding="14"
+                    Background="{DynamicResource SurfaceBrush}" Margin="8,0,0,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="ConfigPanel">
+                        <!-- Step config (shown when a step is selected) -->
+                        <StackPanel x:Name="StepConfigPanel" Visibility="Collapsed">
+                            <TextBlock Text="STEP CONFIGURATION" FontSize="10" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextMutedBrush}" Margin="0,0,0,10"/>
+
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Step Name" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                                    <TextBox x:Name="StepNameBox" FontSize="13" Padding="8,6"
+                                             Background="{DynamicResource InputBrush}"
+                                             Foreground="{DynamicResource TextPrimaryBrush}"
+                                             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                </StackPanel>
+                                <Button x:Name="DeleteStepButton" Grid.Column="1" Padding="8,6" Margin="8,17,0,0"
+                                        Cursor="Hand" BorderThickness="0" VerticalAlignment="Top">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="Bd" Background="{DynamicResource CardBrush}"
+                                                    CornerRadius="6" Padding="{TemplateBinding Padding}"
+                                                    BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}">
+                                                <TextBlock Text="🗑" FontSize="12"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="{StaticResource ErrorBrush}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
+
+                            <TextBlock Text="Type" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                            <ComboBox x:Name="StepTypeCombo" FontSize="13" Padding="8,6" Margin="0,0,0,8">
+                                <ComboBoxItem Content="Execute"/>
+                                <ComboBoxItem Content="Extract"/>
+                                <ComboBoxItem Content="Validate"/>
+                            </ComboBox>
+
+                            <TextBlock Text="Command" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                            <TextBox x:Name="StepCommandBox" FontSize="12" Padding="8,6"
+                                     FontFamily="Cascadia Code,Consolas" AcceptsReturn="True" MinHeight="50"
+                                     TextWrapping="Wrap"
+                                     Background="{DynamicResource InputBrush}"
+                                     Foreground="{DynamicResource TextPrimaryBrush}"
+                                     BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                     Margin="0,0,0,8"/>
+
+                            <TextBlock Text="Working Directory (optional)" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                            <TextBox x:Name="StepWorkDirBox" FontSize="13" Padding="8,6"
+                                     Background="{DynamicResource InputBrush}"
+                                     Foreground="{DynamicResource TextPrimaryBrush}"
+                                     BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                     Margin="0,0,0,8"/>
+
+                            <TextBlock Text="Output Key" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                            <TextBox x:Name="StepOutputKeyBox" FontSize="13" Padding="8,6"
+                                     Background="{DynamicResource InputBrush}"
+                                     Foreground="{DynamicResource TextPrimaryBrush}"
+                                     BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                     Margin="0,0,0,8"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                    <TextBlock Text="Timeout (sec)" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                                    <TextBox x:Name="StepTimeoutBox" FontSize="13" Padding="8,6"
+                                             Background="{DynamicResource InputBrush}"
+                                             Foreground="{DynamicResource TextPrimaryBrush}"
+                                             BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                    <TextBlock Text="On Fail" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                                    <ComboBox x:Name="StepFailCombo" FontSize="13" Padding="8,6">
+                                        <ComboBoxItem Content="Continue"/>
+                                        <ComboBoxItem Content="Abort"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Extract-specific fields -->
+                            <StackPanel x:Name="ExtractFields" Visibility="Collapsed" Margin="0,8,0,0">
+                                <TextBlock Text="File Path (for file extraction)" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                                <TextBox x:Name="StepFilePathBox" FontSize="13" Padding="8,6"
+                                         Background="{DynamicResource InputBrush}"
+                                         Foreground="{DynamicResource TextPrimaryBrush}"
+                                         BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                         Margin="0,0,0,8"/>
+
+                                <TextBlock Text="Extraction Pattern (regex)" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                                <TextBox x:Name="StepPatternBox" FontSize="12" Padding="8,6"
+                                         FontFamily="Cascadia Code,Consolas"
+                                         Background="{DynamicResource InputBrush}"
+                                         Foreground="{DynamicResource TextPrimaryBrush}"
+                                         BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Markers section -->
+                        <StackPanel x:Name="MarkersSection" Margin="0,20,0,0">
+                            <Grid Margin="0,0,0,8">
+                                <TextBlock Text="MARKERS" FontSize="10" FontWeight="Bold"
+                                           Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+                                <Button x:Name="AddMarkerButton" HorizontalAlignment="Right" Padding="8,3"
+                                        Cursor="Hand" BorderThickness="0">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="Bd" Background="{DynamicResource CardBrush}"
+                                                    CornerRadius="6" Padding="{TemplateBinding Padding}"
+                                                    BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}">
+                                                <TextBlock Text="+ Add" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHoverBrush}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
+                            <StackPanel x:Name="MarkerList"/>
+                        </StackPanel>
+
+                        <!-- File Access Rules section -->
+                        <StackPanel x:Name="FileRulesSection" Margin="0,20,0,0">
+                            <Grid Margin="0,0,0,8">
+                                <TextBlock Text="FILE ACCESS RULES" FontSize="10" FontWeight="Bold"
+                                           Foreground="{DynamicResource TextMutedBrush}" VerticalAlignment="Center"/>
+                                <Button x:Name="AddRuleButton" HorizontalAlignment="Right" Padding="8,3"
+                                        Cursor="Hand" BorderThickness="0">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="Bd" Background="{DynamicResource CardBrush}"
+                                                    CornerRadius="6" Padding="{TemplateBinding Padding}"
+                                                    BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}">
+                                                <TextBlock Text="+ Add" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHoverBrush}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+                            </Grid>
+                            <StackPanel x:Name="RuleList"/>
+                        </StackPanel>
+
+                        <!-- Empty state when nothing selected -->
+                        <TextBlock x:Name="EmptyConfigText" Text="Select a step to edit its configuration"
+                                   FontSize="13" Foreground="{DynamicResource TextMutedBrush}"
+                                   HorizontalAlignment="Center" Margin="0,40,0,0"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

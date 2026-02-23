@@ -1,0 +1,19 @@
+<UserControl x:Class="SelfHealingPipeline.Controls.ProgressRing"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root"
+             Width="64" Height="64">
+    <Grid>
+        <!-- Background circle -->
+        <Ellipse Stroke="{DynamicResource BorderBrush}" StrokeThickness="4"
+                 Fill="Transparent"/>
+        <!-- Progress arc drawn in code-behind -->
+        <Canvas x:Name="ArcCanvas" ClipToBounds="False"/>
+        <!-- Center text -->
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock x:Name="ValueText" Text="0/0" FontSize="14" FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

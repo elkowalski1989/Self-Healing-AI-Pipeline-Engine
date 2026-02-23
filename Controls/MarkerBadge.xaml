@@ -1,0 +1,21 @@
+<UserControl x:Class="SelfHealingPipeline.Controls.MarkerBadge"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root">
+    <Border x:Name="BadgeBorder" CornerRadius="8" Padding="14,10" MinWidth="140"
+            Background="{DynamicResource CardBrush}" BorderThickness="1"
+            BorderBrush="{DynamicResource BorderBrush}">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Ellipse x:Name="StatusDot" Width="8" Height="8" Margin="0,0,8,0"
+                         Fill="{DynamicResource TextMutedBrush}"/>
+                <TextBlock x:Name="NameText" Text="Marker" FontSize="12" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+            </StackPanel>
+            <TextBlock x:Name="ValueText" Text="--" FontSize="11" Margin="16,4,0,0"
+                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <TextBlock x:Name="TargetText" Text="" FontSize="10" Margin="16,2,0,0"
+                       Foreground="{DynamicResource TextMutedBrush}"/>
+        </StackPanel>
+    </Border>
+</UserControl>

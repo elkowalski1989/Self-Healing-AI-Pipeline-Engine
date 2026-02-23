@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+%TEMP%/
+binDebugnet10.0-windows7.0-temp/
+Self-Healing-AI-Pipeline-Engine/obj/
+settings.json
+history/

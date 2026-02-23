@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>SelfHealingPipeline</RootNamespace>
+    <AssemblyName>Self-Healing-AI-Pipeline-Engine</AssemblyName>
+  </PropertyGroup>
+
+</Project>

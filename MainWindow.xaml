@@ -1,0 +1,41 @@
+<Window x:Class="SelfHealingPipeline.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:SelfHealingPipeline.Controls"
+        Title="Self-Healing AI Pipeline Engine"
+        Width="1200" Height="750" MinWidth="900" MinHeight="550"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WindowBrush}">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="72"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="{DynamicResource SidebarBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+            <DockPanel>
+                <!-- Bottom buttons -->
+                <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,8">
+                    <controls:SidebarButton x:Name="NavSettings" Icon="⚙" Label="Settings"/>
+                    <controls:SidebarButton x:Name="ThemeButton" Icon="☀" Label="Theme"/>
+                </StackPanel>
+
+                <!-- Nav buttons -->
+                <StackPanel Margin="0,12,0,0">
+                    <controls:SidebarButton x:Name="NavSetup" Icon="💬" Label="Setup"/>
+                    <controls:SidebarButton x:Name="NavEdit" Icon="✏" Label="Edit"/>
+                    <controls:SidebarButton x:Name="NavRun" Icon="▶" Label="Run" IsActive="True"/>
+                    <controls:SidebarButton x:Name="NavHistory" Icon="📋" Label="History"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Content area -->
+        <Border Grid.Column="1" Padding="0">
+            <Grid x:Name="ContentHost"/>
+        </Border>
+    </Grid>
+</Window>

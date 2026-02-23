@@ -1,0 +1,231 @@
+<UserControl x:Class="SelfHealingPipeline.Views.RunView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:SelfHealingPipeline.Controls">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Top bar: pipeline info + progress ring -->
+        <Border Grid.Row="0" CornerRadius="12" Padding="20,14"
+                Background="{DynamicResource SurfaceBrush}" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock x:Name="PipelineNameText" Text="No pipeline loaded"
+                               FontSize="20" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock x:Name="PipelineDescText" Text="Load a pipeline JSON to begin"
+                               FontSize="12" Margin="0,4,0,0"
+                               Foreground="{DynamicResource TextSecondaryBrush}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <TextBlock x:Name="StatusText" Text="Idle" FontSize="13" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               HorizontalAlignment="Right"/>
+                    <TextBlock x:Name="ElapsedText" Text="" FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}"
+                               HorizontalAlignment="Right" Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <controls:ProgressRing x:Name="IterationRing" Grid.Column="2"/>
+            </Grid>
+        </Border>
+
+        <!-- Marker strip -->
+        <Border Grid.Row="1" CornerRadius="12" Padding="12,10"
+                Background="{DynamicResource SurfaceBrush}" Margin="0,0,0,12">
+            <StackPanel>
+                <TextBlock Text="MARKERS" FontSize="10" FontWeight="Bold" Margin="4,0,0,6"
+                           Foreground="{DynamicResource TextMutedBrush}"/>
+                <ItemsControl x:Name="MarkerStrip">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <!-- Claude CLI warning banner -->
+        <Border x:Name="ClaudeWarningBanner" Grid.Row="2" CornerRadius="8" Padding="12,8"
+                Background="#40f59e0b" Margin="0,0,0,8" Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="⚠" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"
+                           Foreground="{StaticResource WarningBrush}"/>
+                <TextBlock x:Name="ClaudeWarningText"
+                           Text="Claude CLI not found — check Settings."
+                           FontSize="12" Foreground="{StaticResource WarningBrush}" VerticalAlignment="Center"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Regression warning banner -->
+        <Border x:Name="RegressionBanner" Grid.Row="3" CornerRadius="8" Padding="12,8"
+                Background="#40ef4444" Margin="0,0,0,8" Visibility="Collapsed">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="⚠" FontSize="16" VerticalAlignment="Center" Margin="0,0,8,0"
+                           Foreground="{StaticResource WarningBrush}"/>
+                <TextBlock Text="Regression detected — markers are getting worse across iterations. Pipeline was aborted."
+                           FontSize="12" Foreground="{StaticResource WarningBrush}" VerticalAlignment="Center"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Log area -->
+        <Border Grid.Row="4" CornerRadius="12" Padding="12"
+                Background="{DynamicResource SurfaceBrush}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="4,0,4,8">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="LIVE LOG" FontSize="10" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextMutedBrush}"/>
+                        <TextBlock x:Name="PhaseLabel" Text="" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource AccentBrush}" Margin="12,0,0,0"/>
+                    </StackPanel>
+                    <TextBlock x:Name="IterationLabel" Text="" FontSize="10" FontWeight="Bold"
+                               Foreground="{DynamicResource TextMutedBrush}"
+                               HorizontalAlignment="Right"/>
+                </Grid>
+
+                <ScrollViewer Grid.Row="1" x:Name="LogScroller"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <Grid>
+                        <TextBlock x:Name="EmptyLogText" Text="No runs yet. Load a pipeline and click Start."
+                                   FontSize="13" Foreground="{DynamicResource TextMutedBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Margin="0,40,0,0"/>
+                        <StackPanel x:Name="LogPanel"/>
+                    </Grid>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- Control bar -->
+        <Border Grid.Row="5" Margin="0,12,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button x:Name="LoadButton" Margin="0,0,8,0" Padding="16,10"
+                            Background="{DynamicResource CardBrush}"
+                            Foreground="{DynamicResource TextPrimaryBrush}"
+                            FontSize="13" BorderThickness="0" Cursor="Hand">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}"
+                                        CornerRadius="10" Padding="{TemplateBinding Padding}"
+                                        BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource CardHoverBrush}"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <TextBlock Text="📂 Load Pipeline" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    </Button>
+
+                    <Button x:Name="StartButton" Margin="0,0,8,0" Padding="20,10"
+                            FontSize="13" BorderThickness="0" Cursor="Hand"
+                            IsEnabled="False">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd" Background="{StaticResource AccentBrush}"
+                                        CornerRadius="10" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background"
+                                                Value="{StaticResource AccentHoverBrush}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <TextBlock Text="▶  Start" Foreground="White" FontWeight="SemiBold"/>
+                    </Button>
+
+                    <Button x:Name="PauseButton" Margin="0,0,8,0" Padding="16,10"
+                            FontSize="13" BorderThickness="0" Cursor="Hand"
+                            IsEnabled="False">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd" Background="{DynamicResource CardBrush}"
+                                        CornerRadius="10" Padding="{TemplateBinding Padding}"
+                                        BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="{StaticResource WarningBrush}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <TextBlock x:Name="PauseButtonText" Text="⏸ Pause" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    </Button>
+
+                    <Button x:Name="StopButton" Padding="16,10"
+                            FontSize="13" BorderThickness="0" Cursor="Hand"
+                            IsEnabled="False">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd" Background="{DynamicResource CardBrush}"
+                                        CornerRadius="10" Padding="{TemplateBinding Padding}"
+                                        BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="{StaticResource ErrorBrush}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <TextBlock x:Name="StopButtonText" Text="■  Stop" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    </Button>
+                </StackPanel>
+
+                <TextBlock Grid.Column="2" x:Name="CostText" Text=""
+                           FontSize="11" VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextMutedBrush}"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

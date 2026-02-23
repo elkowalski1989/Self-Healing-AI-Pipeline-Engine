@@ -1,0 +1,51 @@
+<UserControl x:Class="SelfHealingPipeline.Views.HistoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <StackPanel>
+                <TextBlock Text="Run History" FontSize="20" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                <TextBlock x:Name="CountLabel" Text="No runs yet"
+                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+            </StackPanel>
+            <Button x:Name="RefreshButton" HorizontalAlignment="Right" VerticalAlignment="Top"
+                    Padding="12,6" Cursor="Hand" BorderThickness="0">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{DynamicResource CardBrush}"
+                                CornerRadius="8" Padding="{TemplateBinding Padding}"
+                                BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}">
+                            <TextBlock Text="⟳ Refresh" FontSize="12" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource CardHoverBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </Grid>
+
+        <!-- Run cards list -->
+        <Border Grid.Row="1" CornerRadius="12" Background="{DynamicResource SurfaceBrush}" Padding="12">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <Grid>
+                    <TextBlock x:Name="EmptyHistoryText" Text="No runs yet. Run a pipeline to see results here."
+                               FontSize="13" Foreground="{DynamicResource TextMutedBrush}"
+                               HorizontalAlignment="Center" VerticalAlignment="Top"
+                               Margin="0,40,0,0"/>
+                    <StackPanel x:Name="RunList"/>
+                </Grid>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>
